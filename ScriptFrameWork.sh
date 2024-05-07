@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Définir le chemin vers le répertoire où se trouve votre classe FrontController
-DIR="D:\Studie\L2 -------S4--------\Mr Naina\MyFrame"
+DIR="D:\Studie\L2 -------S4--------\Mr Naina\Vony"
 
 # Déplacer dans le répertoire contenant votre classe FrontController
 cd "$DIR"
