@@ -45,7 +45,7 @@ public class FrontController extends HttpServlet {
         out.println("<h2>Vos controlleurs : </h2>");
         
         for (String className : controller) {
-            out.println("<p>"+className+"</p>");
+            out.println("<p> @"+className+"</p>");
         }
         out.println("</body>");
         out.println("</html>");
@@ -80,9 +80,10 @@ public class FrontController extends HttpServlet {
 
     public void scan() {
         try {
-            String classesPath = getServletContext().getRealPath("/WEB-INF/classes");
+            String classesPath = getServletContext().getRealPath("../webapps/WEB-INF/classes/controller");
+            System.out.println("Before decoded path: " + decodedPath);
             String decodedPath = URLDecoder.decode(classesPath, "UTF-8");
-            String packagePath = decodedPath +"\\"+ controllerPackage.replace('.', '\\');
+            String packagePath = decodedPath +"\\"+ controllerPackage.replace('.', '/');
             File packageDirectory = new File(packagePath);
             if (packageDirectory.exists() && packageDirectory.isDirectory()) {
                 File[] classFiles = packageDirectory.listFiles((dir, name) -> name.endsWith(".class"));
