@@ -8,15 +8,14 @@ cd "$DIR"
 
 # Compiler le fichier FrontController.java
 
-javac -d . MyController.java
-javac -d . FrontController.java
+javac -d . *.java
 
-# Créer un fichier JAR en incluant le fichier compilé FrontController.class
-jar cf MyController.jar mg
+# Créer un fichier JAR en incluant le fichier compilé *.class
 jar cf FrontController.jar mg
+jar cf AnnotationController.jar mg
 
 # Déplacer le fichier JAR créé dans le répertoire souhaité
-mv MyController.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
 mv FrontController.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
+mv AnnotationController.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
 
 sleep 60
