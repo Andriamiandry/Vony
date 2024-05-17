@@ -1,1 +1,15 @@
-#this is My Frame
+this is My Frame
+
+Vous aurez besoin d'annoter votre Controller affin de pouvoir identifier si s'en est un ou pas. Vous devez l'annoter comme ceci
+~~
+    package controller;
+
+
+    import mg.itu.prom16.AnnotationController;
+
+    @AnnotationController("TestController")
+    public class TestController {
+    //
+
+    }
+~~~
