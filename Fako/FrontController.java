@@ -1,3 +1,4 @@
+
 package mg.itu.prom16;
 
 import mg.itu.prom16.*;
