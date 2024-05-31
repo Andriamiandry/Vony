@@ -1,15 +1,18 @@
-this is My Frame
+this is Vony framework
 
-Vous aurez besoin d'annoter votre Controller affin de pouvoir identifier si s'en est un ou pas. Vous devez l'annoter comme ceci
+Vous aurez besoin d'annoter votre Controller affin de pouvoir identifier si s'en est un ou pas.
+Et aussi annoter vos methods pour pouvoir l'executer via notre framework. Vous devez l'annoter comme ceci
 ~~
-    package controller;
+package controller;
 
+import mg.itu.prom16.*;
 
-    import mg.itu.prom16.AnnotationController;
-
-    @AnnotationController("TestController")
-    public class TestController {
-    //
-
+@AnnotationController("TestController")
+public class TestController {
+    @AnnotationMethode("test")
+    public String testMethod() {
+        return "Oay lelikee";
     }
+}
+
 ~~~
