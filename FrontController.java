@@ -18,11 +18,16 @@ import java.util.Map;
 
 public class FrontController extends HttpServlet {
     private final Map<String, List<Mapping>> urlMapping = new HashMap<>();
+    private final List<Exception> exceptions = new ArrayList<>();
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        scanControllers(config);
+        try {
+            scanControllers(config);
+        } catch (Exception e) {
+            exceptions.add(new ServletException("Error during initialization: " + e.getMessage(), e));
+        }
     }
 
     @Override
@@ -35,7 +40,7 @@ public class FrontController extends HttpServlet {
         processRequest(request, response);
     }
 
-    private synchronized void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             out.println("<html>");
@@ -46,11 +51,9 @@ public class FrontController extends HttpServlet {
             out.println("<h1 style='color:blue'>URL actuelle :</h1>");
             out.println("<p>" + request.getRequestURL() + "</p>");
 
-            String path = request.getPathInfo();
-            if (path == null) {
+            String path = request.getRequestURI().substring(request.getContextPath().length());
+            if (path.isEmpty()) {
                 path = "/";
-            } else if (!path.startsWith("/")) {
-                path = "/" + path;
             }
 
             List<Mapping> matchedMappings = urlMapping.get(path);
@@ -65,10 +68,12 @@ public class FrontController extends HttpServlet {
             } else {
                 out.println("<h2 style='color:red'>Aucun mapping trouvé pour l'URL : " + path + "</h2>");
             }
+            displayExceptions(out);
             out.println("</body>");
             out.println("</html>");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            exceptions.add(e);
+            displayExceptions(new PrintWriter(response.getWriter()));
         }
     }
 
@@ -76,35 +81,32 @@ public class FrontController extends HttpServlet {
         out.println("<p>Classe: " + mapping.getControllerClass().getName() + "</p>");
         out.println("<p>Méthode: " + mapping.getMethod().getName() + "</p>");
     }
-    
-    private void handleMethodInvocation(PrintWriter out, Mapping mapping) {
+
+    private void handleMethodInvocation(PrintWriter out, Mapping mapping) throws Exception {
         try {
             Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
             Object result = mapping.getMethod().invoke(controllerInstance);
-    
+
             if (result instanceof String) {
                 out.println("<p>Valeur de retour: " + result + "</p>");
             } else if (result instanceof ModelView) {
                 ModelView mv = (ModelView) result;
                 displayModelViewData(out, mv);
-                // Do not forward, just display the data
                 out.println("<p>URL de destination: " + mv.getUrl() + "</p>");
             } else {
                 out.println("<p>Valeur de retour non reconnue</p>");
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+            exceptions.add(e);
             out.println("<p style='color:red'>Erreur lors de l'invocation de la méthode: " + e.getMessage() + "</p>");
         }
         out.println("<hr>");
     }
-    
+
     private void displayModelViewData(PrintWriter out, ModelView mv) {
         out.println("<h3>Data:</h3>");
-        for (Map.Entry<String, Object> entry : mv.getData().entrySet()) {
-            out.println("<p>" + entry.getKey() + ": " + entry.getValue() + "</p>");
-        }
-    }    
+        mv.getData().forEach((key, value) -> out.println("<p>" + key + ": " + value + "</p>"));
+    }
 
     private void scanControllers(ServletConfig config) {
         String controllerPackage = config.getInitParameter("controller-package");
@@ -119,7 +121,7 @@ public class FrontController extends HttpServlet {
                 System.out.println("Directory does not exist: " + directory.getAbsolutePath());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            exceptions.add(e);
         }
     }
 
@@ -147,9 +149,25 @@ public class FrontController extends HttpServlet {
                         }
                     }
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    exceptions.add(e);
                 }
             }
+        }
+    }
+
+    private void displayExceptions(PrintWriter out) {
+        if (!exceptions.isEmpty()) {
+            out.println("<h2>Exceptions capturées :</h2>");
+            for (Exception exception : exceptions) {
+                out.println("<p style='color:red;'>Exception: " + exception.getClass().getName() + "</p>");
+                out.println("<p>Message: " + exception.getMessage() + "</p>");
+                for (StackTraceElement element : exception.getStackTrace()) {
+                    out.println("<p>" + element.toString() + "</p>");
+                }
+            }
+        } 
+        else{
+            out.println("<p> No Exception Exception</p>");
         }
     }
 }
