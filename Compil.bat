@@ -16,6 +16,9 @@ jar cf AnnotationController.jar mg
 jar cf AnnotationMethode.jar mg
 jar cf Mapping.jar mg
 jar cf ModelView.jar mg
+jar cf GetAnnotation.jar mg
+jar cf Param.jar mg
+jar cf Post.jar mg
 
 :: Déplacer les fichiers JAR créés dans le répertoire souhaité
 move FrontController.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
@@ -23,6 +26,9 @@ move AnnotationController.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprin
 move AnnotationMethode.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
 move Mapping.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
 move ModelView.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
+move GetAnnotation.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
+move Param.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
+move Post.jar "D:\Studie\L2 -------S4--------\Mr Naina\TestSprint\lib"
 
 :: Attendre 60 secondes
 timeout /t 60
