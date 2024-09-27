@@ -3,7 +3,9 @@ package mg.itu.prom16;
 import mg.itu.prom16.AnnotationController;
 import mg.itu.prom16.GetAnnotation;
 import mg.itu.prom16.Post;
-import mg.itu.prom16.GetParam;
+import mg.itu.prom16.Param;
+import mg.itu.prom16.CustomSession;
+import mg.itu.prom16.Restapi;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +19,6 @@ import mg.itu.prom16.RequestBody;
 import java.lang.reflect.Field;  
 import java.io.*;
 import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import jakarta.servlet.RequestDispatcher; 
@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import com.google.gson.Gson;
 
 public class FrontController extends HttpServlet {
     private List<String> controller = new ArrayList<>();
@@ -83,21 +84,41 @@ public class FrontController extends HttpServlet {
 
                 // Inject parameters
                 Object[] parameters = getMethodParameters(method, request);
-                
+
                 Object object = clazz.getDeclaredConstructor().newInstance();
                 Object returnValue = method.invoke(object, parameters);
 
-                if (returnValue instanceof String) {
-                    out.println("Méthode trouvée dans " + returnValue);
-                } else if (returnValue instanceof ModelView) {
+                // Vérifier si la méthode est annotée avec @Restapi
+                if (method.isAnnotationPresent(Restapi.class)) {
+                    // Transformer le résultat en JSON
+                    response.setContentType("application/json");
+                    Gson gson = new Gson();
+                    String jsonResponse;
+
+                    // Si le retour est ModelView, transformer seulement "data"
+                    if (returnValue instanceof ModelView) {
+                        ModelView modelView = (ModelView) returnValue;
+                        jsonResponse = gson.toJson(modelView.getData());
+                    } else {
+                        // Si ce n'est pas un ModelView, transformer directement l'objet
+                        jsonResponse = gson.toJson(returnValue);
+                    }
+
+                    // Envoyer la réponse JSON
+                    out.print(jsonResponse);
+
+                } if (returnValue instanceof ModelView) {
                     ModelView modelView = (ModelView) returnValue;
                     for (Map.Entry<String, Object> entry : modelView.getData().entrySet()) {
                         request.setAttribute(entry.getKey(), entry.getValue());
                     }
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(modelView.getUrl());
-                    dispatcher.forward(request, response);
+                
+                    // Utiliser sendRedirect pour rediriger vers l'URL spécifiée
+                    String redirectUrl = request.getContextPath() + modelView.getUrl();
+                    response.sendRedirect(redirectUrl);
                 } else {
-                    out.println("Type de données non reconnu");
+                        out.println("Type de données non reconnu");
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -195,12 +216,12 @@ public class FrontController extends HttpServlet {
     
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
-            if (parameter.getType() == MySession.class) {
-                parameterValues[i] = new MySession(session);
+            if (parameter.getType() == CustomSession.class) {
+                parameterValues[i] = new CustomSession(session);
             } else if (parameter.isAnnotationPresent(RequestBody.class)) {
                 parameterValues[i] = createRequestBodyParameter(parameter, request.getParameterMap());
-            } else if (parameter.isAnnotationPresent(GetParam.class)) {
-                GetParam param = parameter.getAnnotation(GetParam.class);
+            } else if (parameter.isAnnotationPresent(Param.class)) {
+                Param param = parameter.getAnnotation(Param.class);
                 parameterValues[i] = request.getParameter(param.value()); // Assuming all parameters are strings for simplicity
             } else {
                 throw new IllegalArgumentException("Paramètre non supporté pour cette méthode");
