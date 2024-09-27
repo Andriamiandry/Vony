@@ -2,10 +2,10 @@ package mg.itu.prom16;
 
 import jakarta.servlet.http.HttpSession;
 
-public class MySession {
+public class CustomSession {
     HttpSession session;
 
-    public MySession(HttpSession session) {
+    public CustomSession(HttpSession session) {
         this.session = session;
     }
 
