@@ -40,4 +40,6 @@ move Restapi.jar "%DEPLOY%"
 move VerbAction.jar "%DEPLOY%"
 
 :: Attendre 60 secondes
+
+
 timeout /t 60
