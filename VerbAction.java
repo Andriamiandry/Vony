@@ -32,6 +32,3 @@ public class VerbAction {
                 ", method='" + method + '\'' +
                 '}';
     }
-}
-
-// modification over here
