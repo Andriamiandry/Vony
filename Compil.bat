@@ -3,7 +3,7 @@ setlocal
 
 :: Définir le chemin vers le répertoire où se trouve votre classe FrontController
 set DIR=D:\Studie\L2 -------S4--------\Mr Naina\Vony
-set DEPLOY = D:\Studie\L2 -------S4--------\Mr Naina\TestSprint 10\lib
+set DEPLOY = D:\Studie\L2 -------S4--------\Mr Naina\TestSprint 11\lib
 
 :: Déplacer dans le répertoire contenant votre classe FrontController
 cd "%DIR%"
